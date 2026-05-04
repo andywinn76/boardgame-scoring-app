@@ -260,7 +260,7 @@ function SetupTab({ players, onSetPlayerCount, onUpdatePlayer }) {
   const usedColors = players.map((p) => p.color);
 
   return (
-    <section className="mt-3 min-h-0 flex-1 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-xl">
+    <section className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-xl">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-black">Setup</h2>
@@ -280,7 +280,7 @@ function SetupTab({ players, onSetPlayerCount, onUpdatePlayer }) {
         </select>
       </div>
 
-      <div className="mt-4 grid gap-3 overflow-y-auto pr-1">
+      <div className="mt-4 grid min-h-0 flex-1 gap-3 overflow-y-auto pr-1 pb-2">
         {players.map((player, index) => (
           <div key={player.id} className="rounded-2xl bg-slate-950 p-3">
             <input
