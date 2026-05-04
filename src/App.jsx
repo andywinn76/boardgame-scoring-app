@@ -173,27 +173,27 @@ export default function App() {
 
 function ScoreTab({ players, onAdjustScore, onAskReset }) {
   const allZero = players.every((p) => p.score === 0);
-  const compactMode = players.length >= 4;
-  const denseMode = players.length >= 6;
+  const compactMode = players.length >= 3;
+  const denseMode = players.length >= 5;
   return (
-    <section className={`mt-3 flex min-h-0 flex-1 flex-col ${denseMode ? "gap-2" : "gap-3"}`}>
-      <div className={`grid min-h-0 flex-1 grid-cols-1 ${denseMode ? "gap-2" : "gap-3"}`}>
+    <section className={`mt-3 flex min-h-0 flex-1 flex-col ${denseMode ? "gap-1.5" : "gap-3"}`}>
+      <div className={`grid min-h-0 flex-1 grid-cols-1 ${denseMode ? "gap-1.5" : "gap-3"}`}>
         {players.map((player) => (
           <article
             key={player.id}
-            className={`grid min-h-0 grid-cols-[auto_1fr_auto] items-center rounded-3xl border-2 shadow-xl ${denseMode ? "gap-2 p-2" : compactMode ? "gap-2 p-3" : "gap-3 p-3"} ${getColorClasses(player.color)}`}
+            className={`grid min-h-0 grid-cols-[auto_1fr_auto] items-center border-2 shadow-xl ${denseMode ? "gap-1.5 rounded-2xl p-1.5" : compactMode ? "gap-2 rounded-3xl p-2" : "gap-3 rounded-3xl p-3"} ${getColorClasses(player.color)}`}
           >
-            <div className="grid gap-2">
+            <div className={`grid ${denseMode ? "gap-1" : "gap-2"}`}>
               <ScoreButton compact={compactMode} dense={denseMode} label="-1" onClick={() => onAdjustScore(player.id, -1)} />
               <ScoreButton compact={compactMode} dense={denseMode} label="-5" onClick={() => onAdjustScore(player.id, -5)} />
             </div>
 
             <div className="min-w-0 text-center">
-              <p className={`${denseMode ? "text-xs" : "text-base"} truncate font-black`}>{player.name}</p>
+              <p className={`${denseMode ? "text-xs" : compactMode ? "text-sm" : "text-base"} truncate font-black leading-tight`}>{player.name}</p>
               <p className={`${denseMode ? "text-4xl" : compactMode ? "text-5xl" : "text-6xl"} font-black leading-none tracking-tight`}>{player.score}</p>
             </div>
 
-            <div className="grid gap-2">
+            <div className={`grid ${denseMode ? "gap-1" : "gap-2"}`}>
               <ScoreButton compact={compactMode} dense={denseMode} label="+1" onClick={() => onAdjustScore(player.id, 1)} />
               <ScoreButton compact={compactMode} dense={denseMode} label="+5" onClick={() => onAdjustScore(player.id, 5)} />
             </div>
@@ -204,7 +204,7 @@ function ScoreTab({ players, onAdjustScore, onAskReset }) {
       <button
         onClick={onAskReset}
         disabled={allZero}
-        className={`shrink-0 rounded-3xl border px-4 ${denseMode ? "py-2 text-sm" : "py-3 text-base"} font-black ${allZero ? "border-slate-700 bg-slate-800 text-slate-500" : "border-red-400/40 bg-red-500/20 text-red-100"}`}
+        className={`shrink-0 rounded-3xl border px-4 ${denseMode ? "py-1.5 text-sm" : "py-3 text-base"} font-black ${allZero ? "border-slate-700 bg-slate-800 text-slate-500" : "border-red-400/40 bg-red-500/20 text-red-100"}`}
       >
         Reset scores
       </button>
@@ -213,12 +213,12 @@ function ScoreTab({ players, onAdjustScore, onAskReset }) {
 }
 
 function ScoreButton({ label, onClick, compact = false, dense = false }) {
-  const sizeClasses = dense ? "h-10 w-14 text-base" : compact ? "h-12 w-14 text-lg" : "h-14 w-16 text-xl";
+  const sizeClasses = dense ? "h-8 w-12 text-base rounded-xl" : compact ? "h-11 w-14 text-lg rounded-2xl" : "h-14 w-16 text-xl rounded-2xl";
 
   return (
     <button
       onClick={onClick}
-      className={`${sizeClasses} rounded-2xl bg-black/30 font-black shadow-lg backdrop-blur active:scale-95`} 
+      className={`${sizeClasses} bg-black/30 font-black shadow-lg backdrop-blur transition-transform active:scale-95`} 
     >
       {label}
     </button>
