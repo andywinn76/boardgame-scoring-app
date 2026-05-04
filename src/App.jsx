@@ -20,8 +20,14 @@ function getColorClasses(color) {
   return COLOR_OPTIONS.find((option) => option.value === color)?.classes ?? COLOR_OPTIONS[0].classes;
 }
 
-function makePlayer(index) {
-  const color = COLOR_OPTIONS[index % COLOR_OPTIONS.length];
+function getFirstUnusedColor(players) {
+  return COLOR_OPTIONS.find(
+    (color) => !players.some((player) => player.color === color.value)
+  ) ?? COLOR_OPTIONS[0];
+}
+
+function makePlayer(index, existingPlayers = []) {
+  const color = getFirstUnusedColor(existingPlayers);
 
   return {
     id: crypto.randomUUID(),
@@ -69,7 +75,7 @@ export default function App() {
       const nextPlayers = [...current.players];
 
       while (nextPlayers.length < count) {
-        nextPlayers.push(makePlayer(nextPlayers.length));
+        nextPlayers.push(makePlayer(nextPlayers.length, nextPlayers));
       }
 
       return {
@@ -112,7 +118,7 @@ export default function App() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h1 className="text-lg font-black leading-tight">Score Pad</h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-400 uppercase">
                 {players.length} players · leader: {leader?.name ?? "—"}
               </p>
             </div>
@@ -171,6 +177,31 @@ export default function App() {
   );
 }
 
+function ColorSwatches({ player, usedColors, onSelectColor }) {
+  return (
+    <div className="flex flex-wrap justify-end gap-2">
+      {COLOR_OPTIONS.map((color) => {
+        const isSelected = player.color === color.value;
+        const isUsed = usedColors.includes(color.value) && !isSelected;
+
+        return (
+          <button
+            key={color.value}
+            type="button"
+            disabled={isUsed}
+            onClick={() => onSelectColor(color.value)}
+            title={isUsed ? `${color.name} is already in use` : color.name}
+            aria-label={`Choose ${color.name}`}
+            className={`h-10 w-10 rounded-full border-4 transition-transform active:scale-95 ${color.classes} ${
+              isSelected ? "border-white ring-2 ring-cyan-300" : "border-slate-700"
+            } ${isUsed ? "cursor-not-allowed opacity-25 grayscale" : ""}`}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 function ScoreTab({ players, onAdjustScore, onAskReset }) {
   const allZero = players.every((p) => p.score === 0);
   const compactMode = players.length >= 3;
@@ -189,8 +220,8 @@ function ScoreTab({ players, onAdjustScore, onAskReset }) {
             </div>
 
             <div className="min-w-0 text-center">
-              <p className={`${denseMode ? "text-xs" : compactMode ? "text-sm" : "text-base"} truncate font-black leading-tight`}>{player.name}</p>
-              <p className={`${denseMode ? "text-4xl" : compactMode ? "text-5xl" : "text-6xl"} font-black leading-none tracking-tight`}>{player.score}</p>
+              <p className={`${denseMode ? "text-xs" : compactMode ? "text-sm" : "text-base"} uppercase truncate font-black leading-tight`}>{player.name}</p>
+              <p className={`${denseMode ? "text-4xl" : compactMode ? "text-5xl" : "text-6xl"} uppercase font-black leading-none tracking-tight`}>{player.score}</p>
             </div>
 
             <div className={`grid ${denseMode ? "gap-1" : "gap-2"}`}>
@@ -226,6 +257,8 @@ function ScoreButton({ label, onClick, compact = false, dense = false }) {
 }
 
 function SetupTab({ players, onSetPlayerCount, onUpdatePlayer }) {
+  const usedColors = players.map((p) => p.color);
+
   return (
     <section className="mt-3 min-h-0 flex-1 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-xl">
       <div className="flex items-center justify-between gap-3">
@@ -247,31 +280,26 @@ function SetupTab({ players, onSetPlayerCount, onUpdatePlayer }) {
         </select>
       </div>
 
-      <div className="mt-4 grid gap-3">
+      <div className="mt-4 grid gap-3 overflow-y-auto pr-1">
         {players.map((player, index) => (
           <div key={player.id} className="rounded-2xl bg-slate-950 p-3">
-            <label className="text-xs font-bold uppercase tracking-wide text-slate-400">
-              Player {index + 1}
-            </label>
+            <input
+              value={player.name}
+              onFocus={(event) => event.target.select()}
+              onChange={(event) => onUpdatePlayer(player.id, { name: event.target.value })}
+              className="w-full bg-transparent text-sm font-bold uppercase tracking-wide text-slate-400 outline-none placeholder:text-slate-600 focus:text-cyan-300"
+              placeholder={`Player ${index + 1}`}
+              aria-label={`Player ${index + 1} name`}
+            />
 
-            <div className="mt-2 grid grid-cols-[1fr_auto] gap-2">
-              <input
-                value={player.name}
-                onChange={(event) => onUpdatePlayer(player.id, { name: event.target.value })}
-                className="min-w-0 rounded-2xl border border-slate-700 bg-slate-900 px-3 py-3 font-bold outline-none focus:border-cyan-400"
+            <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              {/* <p className="min-w-0 truncate text-2xl font-black">{player.name || `Player ${index + 1}`}</p> */}
+
+              <ColorSwatches
+                player={player}
+                usedColors={usedColors}
+                onSelectColor={(color) => onUpdatePlayer(player.id, { color })}
               />
-
-              <select
-                value={player.color}
-                onChange={(event) => onUpdatePlayer(player.id, { color: event.target.value })}
-                className="rounded-2xl border border-slate-700 bg-slate-900 px-3 py-3 font-bold outline-none focus:border-cyan-400"
-              >
-                {COLOR_OPTIONS.map((color) => (
-                  <option key={color.value} value={color.value}>
-                    {color.name}
-                  </option>
-                ))}
-              </select>
             </div>
           </div>
         ))}
