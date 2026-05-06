@@ -3,12 +3,36 @@ import React, { useEffect, useMemo, useState } from "react";
 const STORAGE_KEY = "boardgame-score-pad-v1";
 
 const COLOR_OPTIONS = [
-  { name: "Red", value: "red", classes: "bg-red-500 border-red-300 text-white" },
-  { name: "Blue", value: "blue", classes: "bg-blue-500 border-blue-300 text-white" },
-  { name: "Green", value: "green", classes: "bg-green-500 border-green-300 text-white" },
-  { name: "Yellow", value: "yellow", classes: "bg-yellow-400 border-yellow-200 text-slate-950" },
-  { name: "Purple", value: "purple", classes: "bg-purple-500 border-purple-300 text-white" },
-  { name: "Orange", value: "orange", classes: "bg-orange-500 border-orange-300 text-white" },
+  {
+    name: "Red",
+    value: "red",
+    classes: "bg-red-500 border-red-300 text-white",
+  },
+  {
+    name: "Blue",
+    value: "blue",
+    classes: "bg-blue-500 border-blue-300 text-white",
+  },
+  {
+    name: "Green",
+    value: "green",
+    classes: "bg-green-500 border-green-300 text-white",
+  },
+  {
+    name: "Yellow",
+    value: "yellow",
+    classes: "bg-yellow-400 border-yellow-200 text-slate-950",
+  },
+  {
+    name: "Purple",
+    value: "purple",
+    classes: "bg-purple-500 border-purple-300 text-white",
+  },
+  {
+    name: "Orange",
+    value: "orange",
+    classes: "bg-orange-500 border-orange-300 text-white",
+  },
 ];
 
 const DEFAULT_PLAYERS = [
@@ -17,13 +41,18 @@ const DEFAULT_PLAYERS = [
 ];
 
 function getColorClasses(color) {
-  return COLOR_OPTIONS.find((option) => option.value === color)?.classes ?? COLOR_OPTIONS[0].classes;
+  return (
+    COLOR_OPTIONS.find((option) => option.value === color)?.classes ??
+    COLOR_OPTIONS[0].classes
+  );
 }
 
 function getFirstUnusedColor(players) {
-  return COLOR_OPTIONS.find(
-    (color) => !players.some((player) => player.color === color.value)
-  ) ?? COLOR_OPTIONS[0];
+  return (
+    COLOR_OPTIONS.find(
+      (color) => !players.some((player) => player.color === color.value),
+    ) ?? COLOR_OPTIONS[0]
+  );
 }
 
 function makePlayer(index, existingPlayers = []) {
@@ -54,6 +83,7 @@ function getInitialState() {
 export default function App() {
   const [appState, setAppState] = useState(getInitialState);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showSetupResetConfirm, setShowSetupResetConfirm] = useState(false);
 
   const players = appState.players;
   const activeTab = appState.activeTab;
@@ -89,7 +119,7 @@ export default function App() {
     setAppState((current) => ({
       ...current,
       players: current.players.map((player) =>
-        player.id === playerId ? { ...player, ...updates } : player
+        player.id === playerId ? { ...player, ...updates } : player,
       ),
     }));
   }
@@ -98,7 +128,9 @@ export default function App() {
     setAppState((current) => ({
       ...current,
       players: current.players.map((player) =>
-        player.id === playerId ? { ...player, score: player.score + amount } : player
+        player.id === playerId
+          ? { ...player, score: player.score + amount }
+          : player,
       ),
     }));
   }
@@ -109,6 +141,14 @@ export default function App() {
       players: current.players.map((player) => ({ ...player, score: 0 })),
     }));
     setShowResetConfirm(false);
+  }
+
+  function resetSetup() {
+    setAppState({
+      activeTab: "setup",
+      players: DEFAULT_PLAYERS.map((player) => ({ ...player })),
+    });
+    setShowSetupResetConfirm(false);
   }
 
   return (
@@ -147,7 +187,12 @@ export default function App() {
             onAskReset={() => setShowResetConfirm(true)}
           />
         ) : (
-          <SetupTab players={players} onSetPlayerCount={setPlayerCount} onUpdatePlayer={updatePlayer} />
+          <SetupTab
+            players={players}
+            onSetPlayerCount={setPlayerCount}
+            onUpdatePlayer={updatePlayer}
+            onAskResetSetup={() => setShowSetupResetConfirm(true)}
+          />
         )}
       </div>
 
@@ -156,7 +201,8 @@ export default function App() {
           <div className="w-full max-w-sm rounded-3xl border border-slate-700 bg-slate-900 p-5 shadow-2xl">
             <h2 className="text-xl font-black">Reset all scores?</h2>
             <p className="mt-2 text-sm text-slate-300">
-              This will set every player back to zero. Player names and colors will stay the same.
+              This will set every player back to zero. Player names and colors
+              will stay the same.
             </p>
 
             <div className="mt-5 grid grid-cols-2 gap-3">
@@ -166,13 +212,41 @@ export default function App() {
               >
                 Cancel
               </button>
-              <button onClick={resetScores} className="rounded-2xl bg-red-500 px-4 py-3 font-bold text-white">
+              <button
+                onClick={resetScores}
+                className="rounded-2xl bg-red-500 px-4 py-3 font-bold text-white"
+              >
                 Reset
               </button>
             </div>
           </div>
         </div>
       )}
+      {showSetupResetConfirm && (
+  <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4">
+    <div className="w-full max-w-sm rounded-3xl border border-slate-700 bg-slate-900 p-5 shadow-2xl">
+      <h2 className="text-xl font-black">Reset setup?</h2>
+      <p className="mt-2 text-sm text-slate-300">
+        This will return to two players: Player 1 red and Player 2 blue. All other players and scores will be removed.
+      </p>
+
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <button
+          onClick={() => setShowSetupResetConfirm(false)}
+          className="rounded-2xl bg-slate-700 px-4 py-3 font-bold text-slate-100"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={resetSetup}
+          className="rounded-2xl bg-red-500 px-4 py-3 font-bold text-white"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </main>
   );
 }
@@ -193,7 +267,9 @@ function ColorSwatches({ player, usedColors, onSelectColor }) {
             title={isUsed ? `${color.name} is already in use` : color.name}
             aria-label={`Choose ${color.name}`}
             className={`h-10 w-10 rounded-full border-4 transition-transform active:scale-95 ${color.classes} ${
-              isSelected ? "border-white ring-2 ring-cyan-300" : "border-slate-700"
+              isSelected
+                ? "border-white ring-2 ring-cyan-300"
+                : "border-slate-700"
             } ${isUsed ? "cursor-not-allowed opacity-25 grayscale" : ""}`}
           />
         );
@@ -207,26 +283,58 @@ function ScoreTab({ players, onAdjustScore, onAskReset }) {
   const compactMode = players.length >= 3;
   const denseMode = players.length >= 5;
   return (
-    <section className={`mt-3 flex min-h-0 flex-1 flex-col ${denseMode ? "gap-1.5" : "gap-3"}`}>
-      <div className={`grid min-h-0 flex-1 grid-cols-1 ${denseMode ? "gap-1.5" : "gap-3"}`}>
+    <section
+      className={`mt-3 flex min-h-0 flex-1 flex-col ${denseMode ? "gap-1.5" : "gap-3"}`}
+    >
+      <div
+        className={`grid min-h-0 flex-1 grid-cols-1 ${denseMode ? "gap-1.5" : "gap-3"}`}
+      >
         {players.map((player) => (
           <article
             key={player.id}
             className={`grid min-h-0 grid-cols-[auto_1fr_auto] items-center border-2 shadow-xl ${denseMode ? "gap-1.5 rounded-2xl p-1.5" : compactMode ? "gap-2 rounded-3xl p-2" : "gap-3 rounded-3xl p-3"} ${getColorClasses(player.color)}`}
           >
             <div className={`grid ${denseMode ? "gap-1" : "gap-2"}`}>
-              <ScoreButton compact={compactMode} dense={denseMode} label="-1" onClick={() => onAdjustScore(player.id, -1)} />
-              <ScoreButton compact={compactMode} dense={denseMode} label="-5" onClick={() => onAdjustScore(player.id, -5)} />
+              <ScoreButton
+                compact={compactMode}
+                dense={denseMode}
+                label="-1"
+                onClick={() => onAdjustScore(player.id, -1)}
+              />
+              <ScoreButton
+                compact={compactMode}
+                dense={denseMode}
+                label="-5"
+                onClick={() => onAdjustScore(player.id, -5)}
+              />
             </div>
 
             <div className="min-w-0 text-center">
-              <p className={`${denseMode ? "text-xs" : compactMode ? "text-sm" : "text-base"} uppercase truncate font-black leading-tight`}>{player.name}</p>
-              <p className={`${denseMode ? "text-4xl" : compactMode ? "text-5xl" : "text-6xl"} uppercase font-black leading-none tracking-tight`}>{player.score}</p>
+              <p
+                className={`${denseMode ? "text-xs" : compactMode ? "text-sm" : "text-base"} uppercase truncate font-black leading-tight`}
+              >
+                {player.name}
+              </p>
+              <p
+                className={`${denseMode ? "text-4xl" : compactMode ? "text-5xl" : "text-6xl"} uppercase font-black leading-none tracking-tight`}
+              >
+                {player.score}
+              </p>
             </div>
 
             <div className={`grid ${denseMode ? "gap-1" : "gap-2"}`}>
-              <ScoreButton compact={compactMode} dense={denseMode} label="+1" onClick={() => onAdjustScore(player.id, 1)} />
-              <ScoreButton compact={compactMode} dense={denseMode} label="+5" onClick={() => onAdjustScore(player.id, 5)} />
+              <ScoreButton
+                compact={compactMode}
+                dense={denseMode}
+                label="+1"
+                onClick={() => onAdjustScore(player.id, 1)}
+              />
+              <ScoreButton
+                compact={compactMode}
+                dense={denseMode}
+                label="+5"
+                onClick={() => onAdjustScore(player.id, 5)}
+              />
             </div>
           </article>
         ))}
@@ -244,33 +352,34 @@ function ScoreTab({ players, onAdjustScore, onAskReset }) {
 }
 
 function ScoreButton({ label, onClick, compact = false, dense = false }) {
-  const sizeClasses = dense ? "h-8 w-12 text-base rounded-xl" : compact ? "h-11 w-14 text-lg rounded-2xl" : "h-14 w-16 text-xl rounded-2xl";
+  const sizeClasses = dense
+    ? "h-8 w-12 text-base rounded-xl"
+    : compact
+      ? "h-11 w-14 text-lg rounded-2xl"
+      : "h-14 w-16 text-xl rounded-2xl";
 
   return (
     <button
       onClick={onClick}
-      className={`${sizeClasses} bg-black/30 font-black shadow-lg backdrop-blur transition-transform active:scale-95`} 
+      className={`${sizeClasses} bg-black/30 font-black shadow-lg backdrop-blur transition-transform active:scale-95`}
     >
       {label}
     </button>
   );
 }
 
-function SetupTab({ players, onSetPlayerCount, onUpdatePlayer }) {
+function SetupTab({ players, onSetPlayerCount, onUpdatePlayer, onAskResetSetup }) {
   const usedColors = players.map((p) => p.color);
 
   return (
     <section className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-xl">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-black">Setup</h2>
-          <p className="text-xs text-slate-400">Names, colors, and number of players.</p>
-        </div>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-xl font-black">Setup</h2>
 
         <select
           value={players.length}
           onChange={(event) => onSetPlayerCount(Number(event.target.value))}
-          className="rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2 font-bold outline-none"
+          className="rounded-2xl border border-slate-700 bg-slate-950 px-4 py-2 font-bold outline-none"
         >
           {[2, 3, 4, 5, 6].map((count) => (
             <option key={count} value={count}>
@@ -278,6 +387,13 @@ function SetupTab({ players, onSetPlayerCount, onUpdatePlayer }) {
             </option>
           ))}
         </select>
+        <button
+          type="button"
+          onClick={onAskResetSetup}
+          className="rounded-2xl border border-red-400/40 bg-red-500/20 px-4 py-2 font-bold font-black text-red-100"
+        >
+          Reset
+        </button>
       </div>
 
       <div className="mt-4 grid min-h-0 flex-1 gap-3 overflow-y-auto pr-1 pb-2">
@@ -286,7 +402,9 @@ function SetupTab({ players, onSetPlayerCount, onUpdatePlayer }) {
             <input
               value={player.name}
               onFocus={(event) => event.target.select()}
-              onChange={(event) => onUpdatePlayer(player.id, { name: event.target.value })}
+              onChange={(event) =>
+                onUpdatePlayer(player.id, { name: event.target.value })
+              }
               className="w-full bg-transparent text-sm font-bold uppercase tracking-wide text-slate-400 outline-none placeholder:text-slate-600 focus:text-cyan-300"
               placeholder={`Player ${index + 1}`}
               aria-label={`Player ${index + 1} name`}
