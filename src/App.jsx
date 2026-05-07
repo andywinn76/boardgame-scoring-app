@@ -116,7 +116,7 @@ export default function App() {
         <header className="shrink-0 rounded-3xl border border-slate-800 bg-slate-900 p-3 shadow-xl">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h1 className="text-lg font-black leading-tight">Score Pad</h1>
+              <h1 className="text-lg font-black leading-tight">Scoring Pad</h1>
               <p className="text-xs text-slate-400 uppercase">
                 {players.length} players · leader: {leader?.name ?? "—"}
               </p>

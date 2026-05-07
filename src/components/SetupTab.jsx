@@ -28,22 +28,24 @@ export default function SetupTab({ players, onSetPlayerCount, onUpdatePlayer, on
         </button>
       </div>
 
-      <div className="mt-4 grid min-h-0 flex-1 gap-3 overflow-y-auto pr-1 pb-2">
+      <div className="mt-4 grid min-h-0 gap-3 overflow-y-auto pr-1 pb-2">
         {players.map((player, index) => (
-          <div key={player.id} className="rounded-2xl bg-slate-950 p-3">
+          <div key={player.id} className="rounded-2xl bg-slate-950 p-3 max-h-30">
             <input
               value={player.name}
               onFocus={(event) => event.target.select()}
               onChange={(event) =>
                 onUpdatePlayer(player.id, { name: event.target.value })
               }
-              className="w-full bg-transparent text-sm font-bold uppercase tracking-wide text-slate-400 outline-none placeholder:text-slate-600 focus:text-cyan-300"
+              onKeyDown={(event) => {
+                  if (event.key === "Enter") event.target.blur();
+                }}
+              className="w-full bg-transparent text-xl font-bold uppercase text-center tracking-wide text-slate-400 outline-none placeholder:text-slate-600 focus:text-cyan-300"
               placeholder={`Player ${index + 1}`}
               aria-label={`Player ${index + 1} name`}
             />
 
             <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-              {/* <p className="min-w-0 truncate text-2xl font-black">{player.name || `Player ${index + 1}`}</p> */}
 
               <ColorSwatches
                 player={player}

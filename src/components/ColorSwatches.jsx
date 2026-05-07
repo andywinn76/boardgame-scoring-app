@@ -2,7 +2,7 @@ import { COLOR_OPTIONS } from "../data/data";
 
 export default function ColorSwatches({ player, usedColors, onSelectColor }) {
   return (
-    <div className="flex flex-wrap justify-end gap-2">
+    <div className="flex flex-wrap justify-between gap-2">
       {COLOR_OPTIONS.map((color) => {
         const isSelected = player.color === color.value;
         const isUsed = usedColors.includes(color.value) && !isSelected;

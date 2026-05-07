@@ -40,6 +40,7 @@ export default function ScoreTab({
             } ${getColorClasses(player.color)}`}
           >
             <div className="grid min-h-0 flex-1 grid-rows-[auto_1fr] text-center">
+            {/* Player name and input */}
               <input
                 value={player.name}
                 onFocus={(event) => event.target.select()}
@@ -49,11 +50,12 @@ export default function ScoreTab({
                 onKeyDown={(event) => {
                   if (event.key === "Enter") event.target.blur();
                 }}
-                className={`${denseMode ? "text-sm" : compactMode ? "text-med" : "text-lg"} w-full bg-transparent text-center font-black uppercase leading-tight outline-none focus:text-cyan-300`}
+                className={`${denseMode ? "text-sm" : compactMode ? "text-lg" : "text-xl"} mt-4 w-full bg-transparent text-center font-black uppercase leading-tight outline-none focus:text-cyan-300`}
                 placeholder={`Player ${index + 1}`}
                 aria-label={`Player ${index + 1} name`}
               />
               <div className="grid place-items-center">
+              {/* Player score and input */}
                 <input
                   type="number"
                   value={player.score}
