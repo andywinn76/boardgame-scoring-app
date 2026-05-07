@@ -134,12 +134,12 @@ export default function App() {
             <div className="flex items-center gap-3">
               <img
                 src="/icons/icon-192x192.png"
-                alt="Scorepad logo"
+                alt="EZScorepad logo"
                 className="h-12 w-12 rounded-2xl"
               />
 
               <div>
-                <h1 className="text-lg font-black leading-tight">Scorepad</h1>
+                <h1 className="text-lg font-black leading-tight">EZScorepad</h1>
 
                 <p className="text-xs uppercase text-slate-400">
                   {players.length} players
