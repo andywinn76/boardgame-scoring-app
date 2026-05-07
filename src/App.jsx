@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import SetupTab from "./components/SetupTab";
-import { COLOR_OPTIONS, DEFAULT_PLAYERS } from "./data/data";
 import ScoreTab from "./components/ScoreTab";
 import ConfirmModal from "./components/ConfirmModal";
+import { getColorClasses } from "./data/colors.js";
+import { DEFAULT_PLAYERS } from "./data/data.js";
+import { COLOR_OPTIONS, getLeaderTextClass } from "./data/colors.js";
 
 const STORAGE_KEY = "boardgame-score-pad-v1";
 
@@ -52,7 +54,21 @@ export default function App() {
   }, [appState]);
 
   const leader = useMemo(() => {
-    return [...players].sort((a, b) => b.score - a.score)[0];
+    // Hide leader if everyone is exactly zero
+    if (players.every((p) => p.score === 0)) {
+      return null;
+    }
+
+    const topScore = Math.max(...players.map((p) => p.score));
+
+    const leaders = players.filter((p) => p.score === topScore);
+
+    // Hide leader if tied for highest score
+    if (leaders.length !== 1) {
+      return null;
+    }
+
+    return leaders[0];
   }, [players]);
 
   function setActiveTab(activeTab) {
@@ -115,23 +131,49 @@ export default function App() {
       <div className="mx-auto flex h-full max-w-md flex-col p-3">
         <header className="shrink-0 rounded-3xl border border-slate-800 bg-slate-900 p-3 shadow-xl">
           <div className="flex items-center justify-between gap-3">
-            <div>
-              <h1 className="text-lg font-black leading-tight">Scoring Pad</h1>
-              <p className="text-xs text-slate-400 uppercase">
-                {players.length} players · leader: {leader?.name ?? "—"}
-              </p>
+            <div className="flex items-center gap-3">
+              <img
+                src="/icons/icon-192x192.png"
+                alt="Scorepad logo"
+                className="h-12 w-12 rounded-2xl"
+              />
+
+              <div>
+                <h1 className="text-lg font-black leading-tight">Scorepad</h1>
+
+                <p className="text-xs uppercase text-slate-400">
+                  {players.length} players
+                  {leader && (
+                    <>
+                      {" · leader: "}
+                      <span className={getLeaderTextClass(leader.color)}>
+                        {leader.name}
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div>
             </div>
 
             <div className="flex rounded-2xl bg-slate-950 p-1 text-sm font-bold">
               <button
                 onClick={() => setActiveTab("score")}
-                className={`rounded-xl px-3 py-2 ${activeTab === "score" ? "bg-cyan-400 text-slate-950" : "text-slate-300"}`}
+                className={`rounded-xl px-3 py-2 ${
+                  activeTab === "score"
+                    ? "bg-cyan-400 text-slate-950"
+                    : "text-slate-300"
+                }`}
               >
                 Score
               </button>
+
               <button
                 onClick={() => setActiveTab("setup")}
-                className={`rounded-xl px-3 py-2 ${activeTab === "setup" ? "bg-cyan-400 text-slate-950" : "text-slate-300"}`}
+                className={`rounded-xl px-3 py-2 ${
+                  activeTab === "setup"
+                    ? "bg-cyan-400 text-slate-950"
+                    : "text-slate-300"
+                }`}
               >
                 Setup
               </button>

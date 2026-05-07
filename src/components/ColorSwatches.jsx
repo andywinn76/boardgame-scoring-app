@@ -1,4 +1,4 @@
-import { COLOR_OPTIONS } from "../data/data";
+import { COLOR_OPTIONS } from "../data/colors.js";
 
 export default function ColorSwatches({ player, usedColors, onSelectColor }) {
   return (

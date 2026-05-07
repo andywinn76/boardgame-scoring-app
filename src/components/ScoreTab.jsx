@@ -1,12 +1,5 @@
-import { COLOR_OPTIONS } from "../data/data";
 import ScoreButton from "./ScoreButton";
-
-function getColorClasses(color) {
-  return (
-    COLOR_OPTIONS.find((option) => option.value === color)?.classes ??
-    COLOR_OPTIONS[0].classes
-  );
-}
+import { getColorClasses } from "../data/colors.js";
 
 export default function ScoreTab({
   players,
@@ -40,7 +33,7 @@ export default function ScoreTab({
             } ${getColorClasses(player.color)}`}
           >
             <div className="grid min-h-0 flex-1 grid-rows-[auto_1fr] text-center">
-            {/* Player name and input */}
+              {/* Player name and input */}
               <input
                 value={player.name}
                 onFocus={(event) => event.target.select()}
@@ -55,7 +48,7 @@ export default function ScoreTab({
                 aria-label={`Player ${index + 1} name`}
               />
               <div className="grid place-items-center">
-              {/* Player score and input */}
+                {/* Player score and input */}
                 <input
                   type="number"
                   value={player.score}
