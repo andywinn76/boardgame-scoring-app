@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import SetupTab from "./components/SetupTab";
 import ScoreTab from "./components/ScoreTab";
 import ConfirmModal from "./components/ConfirmModal";
-import { getColorClasses } from "./data/colors.js";
 import { DEFAULT_PLAYERS } from "./data/data.js";
 import { COLOR_OPTIONS, getLeaderTextClass } from "./data/colors.js";
 
