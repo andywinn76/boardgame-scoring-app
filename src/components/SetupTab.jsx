@@ -47,7 +47,7 @@ export default function SetupTab({
               : "border-slate-700 bg-slate-950 text-slate-300"
           }`}
         >
-          Table Mode: {tableMode ? "On" : "Off"}
+          2 Player Rotate: {tableMode ? "On" : "Off"}
         </button>
       )}
 
