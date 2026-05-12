@@ -37,6 +37,7 @@ function getInitialState() {
   return {
     activeTab: "score",
     players: DEFAULT_PLAYERS,
+    tableMode: false,
   };
 }
 
@@ -47,6 +48,7 @@ export default function App() {
 
   const players = appState.players;
   const activeTab = appState.activeTab;
+  const tableMode = appState.tableMode ?? false;
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
@@ -69,6 +71,13 @@ export default function App() {
 
     return leaders[0];
   }, [players]);
+
+  function toggleTableMode() {
+    setAppState((current) => ({
+      ...current,
+      tableMode: !current.tableMode,
+    }));
+  }
 
   function setActiveTab(activeTab) {
     setAppState((current) => ({ ...current, activeTab }));
@@ -184,12 +193,16 @@ export default function App() {
           <ScoreTab
             players={players}
             onAdjustScore={adjustScore}
+            tableMode={tableMode}
+            onToggleTableMode={toggleTableMode}
             onUpdatePlayer={updatePlayer}
             onAskReset={() => setShowResetConfirm(true)}
           />
         ) : (
           <SetupTab
             players={players}
+            tableMode={tableMode}
+            onToggleTableMode={toggleTableMode}
             onSetPlayerCount={setPlayerCount}
             onUpdatePlayer={updatePlayer}
             onAskResetSetup={() => setShowSetupResetConfirm(true)}

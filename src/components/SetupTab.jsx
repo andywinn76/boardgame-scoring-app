@@ -1,7 +1,15 @@
 import ColorSwatches from "./ColorSwatches";
 
-export default function SetupTab({ players, onSetPlayerCount, onUpdatePlayer, onAskResetSetup }) {
+export default function SetupTab({
+  players,
+  tableMode = false,
+  onToggleTableMode,
+  onSetPlayerCount,
+  onUpdatePlayer,
+  onAskResetSetup,
+}) {
   const usedColors = players.map((p) => p.color);
+  const canUseTableMode = players.length === 2;
 
   return (
     <section className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-xl">
@@ -19,18 +27,36 @@ export default function SetupTab({ players, onSetPlayerCount, onUpdatePlayer, on
             </option>
           ))}
         </select>
+
         <button
           type="button"
           onClick={onAskResetSetup}
-          className="rounded-2xl border border-red-400/40 bg-red-500/20 px-4 py-2 font-bold font-black text-red-100"
+          className="rounded-2xl border border-red-400/40 bg-red-500/20 px-4 py-2 font-black text-red-100"
         >
           Reset
         </button>
       </div>
 
+      {canUseTableMode && (
+        <button
+          type="button"
+          onClick={onToggleTableMode}
+          className={`mt-4 rounded-2xl border px-4 py-3 text-sm font-black ${
+            tableMode
+              ? "border-cyan-300 bg-cyan-400 text-slate-950"
+              : "border-slate-700 bg-slate-950 text-slate-300"
+          }`}
+        >
+          Table Mode: {tableMode ? "On" : "Off"}
+        </button>
+      )}
+
       <div className="mt-4 grid min-h-0 gap-3 overflow-y-auto pr-1 pb-2">
         {players.map((player, index) => (
-          <div key={player.id} className="rounded-2xl bg-slate-950 p-3 max-h-30">
+          <div
+            key={player.id}
+            className="max-h-30 rounded-2xl bg-slate-950 p-3"
+          >
             <input
               value={player.name}
               onFocus={(event) => event.target.select()}
@@ -38,15 +64,14 @@ export default function SetupTab({ players, onSetPlayerCount, onUpdatePlayer, on
                 onUpdatePlayer(player.id, { name: event.target.value })
               }
               onKeyDown={(event) => {
-                  if (event.key === "Enter") event.target.blur();
-                }}
-              className="w-full bg-transparent text-xl font-bold uppercase text-center tracking-wide text-slate-400 outline-none placeholder:text-slate-600 focus:text-cyan-300"
+                if (event.key === "Enter") event.target.blur();
+              }}
+              className="w-full bg-transparent text-center text-xl font-bold uppercase tracking-wide text-slate-400 outline-none placeholder:text-slate-600 focus:text-cyan-300"
               placeholder={`Player ${index + 1}`}
               aria-label={`Player ${index + 1} name`}
             />
 
             <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-
               <ColorSwatches
                 player={player}
                 usedColors={usedColors}
