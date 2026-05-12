@@ -101,18 +101,22 @@ export default function ScoreTab({
           <div className="grid w-full grid-cols-4 gap-2.5 mb-4">
             <ScoreButton
               label="-5"
+              compact={true}
               onClick={() => onAdjustScore(player.id, -5)}
             />
             <ScoreButton
               label="-1"
+              compact={true}  
               onClick={() => onAdjustScore(player.id, -1)}
             />
             <ScoreButton
               label="+1"
+              compact={true}
               onClick={() => onAdjustScore(player.id, 1)}
             />
             <ScoreButton
               label="+5"
+              compact={true}
               onClick={() => onAdjustScore(player.id, 5)}
             />
           </div>
