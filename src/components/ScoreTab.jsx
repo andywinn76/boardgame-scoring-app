@@ -98,7 +98,7 @@ export default function ScoreTab({
             Splitting negative/positive buttons left/right
             became visually confusing once rotated.
           */}
-          <div className="grid w-full grid-cols-4 gap-1.5 mb-4">
+          <div className="grid w-full grid-cols-4 gap-2.5 mb-4">
             <ScoreButton
               label="-5"
               onClick={() => onAdjustScore(player.id, -5)}
