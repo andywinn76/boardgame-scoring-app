@@ -3,40 +3,99 @@ import SetupTab from "./components/SetupTab";
 import ScoreTab from "./components/ScoreTab";
 import ConfirmModal from "./components/ConfirmModal";
 import { DEFAULT_PLAYERS } from "./data/data.js";
-import { COLOR_OPTIONS, getLeaderTextClass } from "./data/colors.js";
+import {
+  PLAYER_COLOR_PRESETS,
+  getPresetForIndex,
+  LEGACY_COLOR_NAME_TO_HEX,
+  normalizeHex,
+} from "./data/colors.js";
 
 const STORAGE_KEY = "boardgame-score-pad-v1";
 
-function getFirstUnusedColor(players) {
+/**
+ * Pick the first preset whose bg color is not already used by an
+ * existing player. Falls back to the first preset if all are taken.
+ */
+function getFirstUnusedPreset(players) {
+  const usedBgs = new Set(
+    players.map((p) => normalizeHex(p.bgColor)).filter(Boolean),
+  );
   return (
-    COLOR_OPTIONS.find(
-      (color) => !players.some((player) => player.color === color.value),
-    ) ?? COLOR_OPTIONS[0]
+    PLAYER_COLOR_PRESETS.find(
+      (preset) => !usedBgs.has(normalizeHex(preset.bg)),
+    ) ?? PLAYER_COLOR_PRESETS[0]
   );
 }
 
 function makePlayer(index, existingPlayers = []) {
-  const color = getFirstUnusedColor(existingPlayers);
+  // Prefer the index-aligned preset, but fall back to the first
+  // unused preset if that slot's color is already taken by another
+  // player (e.g. after the user customized earlier slots).
+  const slotPreset = getPresetForIndex(index);
+  const slotPresetTaken = existingPlayers.some(
+    (p) => normalizeHex(p.bgColor) === normalizeHex(slotPreset.bg),
+  );
+  const preset = slotPresetTaken
+    ? getFirstUnusedPreset(existingPlayers)
+    : slotPreset;
 
   return {
     id: crypto.randomUUID(),
     name: `Player ${index + 1}`,
-    color: color.value,
+    bgColor: preset.bg,
+    textColor: preset.text,
     score: 0,
+  };
+}
+
+/**
+ * Migrate a possibly-legacy persisted player to the current shape.
+ * Older versions stored `color: "red"` instead of bgColor/textColor.
+ */
+function migratePlayer(player, index) {
+  if (!player || typeof player !== "object") {
+    return makePlayer(index);
+  }
+
+  // Already on the new shape.
+  if (player.bgColor && player.textColor) {
+    return player;
+  }
+
+  // Legacy shape: { color: "red" | "blue" | ... }
+  const legacy = LEGACY_COLOR_NAME_TO_HEX[player.color];
+  const fallback = getPresetForIndex(index);
+  const bgColor = legacy?.bg ?? fallback.bg;
+  const textColor = legacy?.text ?? fallback.text;
+
+  return {
+    id: player.id ?? crypto.randomUUID(),
+    name: player.name ?? `Player ${index + 1}`,
+    score: typeof player.score === "number" ? player.score : 0,
+    bgColor,
+    textColor,
   };
 }
 
 function getInitialState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        ...parsed,
+        players: Array.isArray(parsed.players)
+          ? parsed.players.map(migratePlayer)
+          : DEFAULT_PLAYERS.map((p) => ({ ...p })),
+      };
+    }
   } catch {
     // Fall back to defaults if saved data is broken or unavailable.
   }
 
   return {
     activeTab: "score",
-    players: DEFAULT_PLAYERS,
+    players: DEFAULT_PLAYERS.map((p) => ({ ...p })),
     tableMode: false,
   };
 }
@@ -130,6 +189,7 @@ export default function App() {
     setAppState({
       activeTab: "setup",
       players: DEFAULT_PLAYERS.map((player) => ({ ...player })),
+      tableMode: false,
     });
     setShowSetupResetConfirm(false);
   }
@@ -154,7 +214,10 @@ export default function App() {
                   {leader && (
                     <>
                       {" · leader: "}
-                      <span className={getLeaderTextClass(leader.color)}>
+                      <span
+                        className="font-bold"
+                        style={{ color: leader.bgColor }}
+                      >
                         {leader.name}
                       </span>
                     </>

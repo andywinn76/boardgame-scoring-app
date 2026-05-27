@@ -1,4 +1,4 @@
-import ColorSwatches from "./ColorSwatches";
+import PlayerColorControls from "./PlayerColorControls";
 
 export default function SetupTab({
   players,
@@ -8,7 +8,6 @@ export default function SetupTab({
   onUpdatePlayer,
   onAskResetSetup,
 }) {
-  const usedColors = players.map((p) => p.color);
   const canUseTableMode = players.length === 2;
 
   return (
@@ -55,8 +54,11 @@ export default function SetupTab({
         {players.map((player, index) => (
           <div
             key={player.id}
-            className="max-h-30 rounded-2xl bg-slate-950 p-3"
+            className="rounded-2xl border border-slate-800 p-3"
+            style={{ backgroundColor: player.bgColor, color: player.textColor }}
           >
+            {/* Name input — uses currentColor so the user's chosen text
+                color drives the typed text + placeholder shadow. */}
             <input
               value={player.name}
               onFocus={(event) => event.target.select()}
@@ -66,18 +68,19 @@ export default function SetupTab({
               onKeyDown={(event) => {
                 if (event.key === "Enter") event.target.blur();
               }}
-              className="w-full bg-transparent text-center text-xl font-bold uppercase tracking-wide text-slate-400 outline-none placeholder:text-slate-600 focus:text-cyan-300"
+              className="w-full bg-transparent text-center text-xl font-bold uppercase tracking-wide outline-none placeholder:opacity-60"
+              style={{ color: "currentColor" }}
               placeholder={`Player ${index + 1}`}
               aria-label={`Player ${index + 1} name`}
             />
 
-            <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-              <ColorSwatches
+            
+              <PlayerColorControls
                 player={player}
-                usedColors={usedColors}
-                onSelectColor={(color) => onUpdatePlayer(player.id, { color })}
+                allPlayers={players}
+                onUpdate={(updates) => onUpdatePlayer(player.id, updates)}
               />
-            </div>
+            
           </div>
         ))}
       </div>

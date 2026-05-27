@@ -1,5 +1,4 @@
 import ScoreButton from "./ScoreButton";
-import { getColorClasses } from "../data/colors.js";
 
 export default function ScoreTab({
   players,
@@ -39,9 +38,11 @@ export default function ScoreTab({
     return (
       <article
         key={player.id}
-        className={`relative min-h-0 overflow-hidden rounded-3xl border-2 shadow-xl ${getColorClasses(
-          player.color,
-        )}`}
+        className="relative min-h-0 overflow-hidden rounded-3xl border-2 border-black/20 shadow-xl"
+        style={{
+          backgroundColor: player.bgColor,
+          color: player.textColor,
+        }}
       >
         {/* 
           Rotated inner content container.
@@ -135,13 +136,17 @@ export default function ScoreTab({
     return (
       <article
         key={player.id}
-        className={`flex min-h-0 flex-col border-2 shadow-xl ${
+        className={`flex min-h-0 flex-col border-2 border-black/20 shadow-xl ${
           denseMode
             ? "rounded-2xl p-1.5"
             : compactMode
               ? "rounded-3xl p-2"
               : "rounded-3xl p-3"
-        } ${getColorClasses(player.color)}`}
+        }`}
+        style={{
+          backgroundColor: player.bgColor,
+          color: player.textColor,
+        }}
       >
         <div className="grid min-h-0 flex-1 grid-rows-[auto_1fr] text-center">
           {/* Player Name */}
