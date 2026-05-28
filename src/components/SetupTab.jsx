@@ -50,7 +50,7 @@ export default function SetupTab({
         </button>
       )}
 
-      <div className="mt-4 grid min-h-0 gap-3 overflow-y-auto pr-1 pb-2">
+      <div className="mt-4 grid min-h-0 gap-3 overflow-y-auto pr-1 pb-2 no-scrollbar">
         {players.map((player, index) => (
           <div
             key={player.id}
