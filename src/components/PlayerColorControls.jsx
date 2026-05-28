@@ -1,5 +1,5 @@
 import ColorPicker from "./ColorPicker";
-import { normalizeHex } from "../data/colors.js";
+import { normalizeHex, getContrastTextColor } from "../data/colors.js";
 
 /**
  * Pair of color pickers (Background + Text) bound to a single player.
@@ -35,7 +35,9 @@ export default function PlayerColorControls({
     <div className="flex items-center justify-center gap-6">
       <ColorPicker
         value={player.bgColor}
-        onChange={(bgColor) => onUpdate({ bgColor })}
+        onChange={(bgColor) =>
+          onUpdate({ bgColor, textColor: getContrastTextColor(bgColor) })
+        }
         disallowedColors={disallowedBg}
         ariaLabel={`Background color for ${player.name}`}
         size={size}

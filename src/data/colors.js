@@ -53,9 +53,33 @@ function normalizeHex(hex) {
   return value;
 }
 
+/**
+ * Returns "#0f172a" (dark) or "#ffffff" (light) for the given background
+ * hex color, using the WCAG relative-luminance formula.
+ *
+ * Colors above the 0.179 luminance threshold (e.g. yellow, lime, cyan)
+ * get dark text; everything else gets white text.
+ */
+function getContrastTextColor(bgHex) {
+  const hex = normalizeHex(bgHex).slice(1); // strip "#"
+  const r = parseInt(hex.slice(0, 2), 16) / 255;
+  const g = parseInt(hex.slice(2, 4), 16) / 255;
+  const b = parseInt(hex.slice(4, 6), 16) / 255;
+
+  // Linearize each channel (gamma correction)
+  const toLinear = (c) =>
+    c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+
+  const luminance =
+    0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+
+  return luminance > 0.179 ? "#0f172a" : "#ffffff";
+}
+
 export {
   PLAYER_COLOR_PRESETS,
   getPresetForIndex,
   LEGACY_COLOR_NAME_TO_HEX,
   normalizeHex,
+  getContrastTextColor,
 };
